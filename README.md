@@ -8,12 +8,12 @@ This bundle provides simple functionality to populate [Elastica](https://github.
 General idea was taken from [Enqueue Elastica Bundle](https://github.com/php-enqueue/enqueue-elastica-bundle)
 
 ### Installation
-
+1)
 ```
 $ composer require vadiktok/rabbitmq-elastica-bundle
 ```
 
-Then, enable the bundle by adding the following line in the app/AppKernel.php file of your project:
+2) Then, enable the bundle by adding the following line in the app/AppKernel.php file of your project:
 
 ```
 <?php
@@ -33,14 +33,21 @@ class AppKernel extends Kernel
     }
 }
 ```
-
-### Configuration
-By default your queue name will be 'vadiktok_elastica'
-To set your own -- use configuration (app/config/config.yml):
+3) Define RabbitMQ producer and consumer in your app/config.yml file:
 
 ```
-vadiktok_elastica:
-    queue_name: your_own_queue_name
+old_sound_rabbit_mq:
+    producers:
+        vadiktok_elastica:
+            connection: default
+            exchange_options: { name: elastica, type: direct }
+            queue_options:    { name: elastica }
+    consumers:
+        vadiktok_elastica:
+            connection: default
+            exchange_options: { name: elastica, type: direct }
+            queue_options:    { name: elastica }
+            callback: vadiktok.rabbitmq.consumer.elastica
 
 ```
 
