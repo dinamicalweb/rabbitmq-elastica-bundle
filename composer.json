@@ -1,0 +1,23 @@
+{
+    "name": "vadiktok/rabbitmq-elastica-bundle",
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "friendsofsymfony/elastica-bundle": "^5.0",
+        "php-amqplib/rabbitmq-bundle": "^1.11",
+        "symfony/symfony": "3.4.*"
+    },
+    "authors": [
+        {
+            "name": "Vadik Tokarchuk",
+            "email": "vadiktok@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Vadiktok\\RabbitMQElasticaBundle\\": "src/RabbitMQElasticaBundle"
+        }
+    }
+}
