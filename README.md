@@ -10,7 +10,7 @@ General idea was taken from [Enqueue Elastica Bundle](https://github.com/php-enq
 ### Installation
 
 ```
-$ composer require vadiktok/elastica-queue-populate-bundle
+$ composer require vadiktok/rabbitmq-elastica-bundle
 ```
 
 Then, enable the bundle by adding the following line in the app/AppKernel.php file of your project:
@@ -26,7 +26,7 @@ class AppKernel extends Kernel
     {
         $bundles = array(
             // ...
-            new Vadiktok\ElasticaQueuePopulateBundle\VadiktokElasticaQueuePopulateBundle(),
+            new Vadiktok\RabbitMQElasticaBundle\VadiktokRabbitMQElasticaBundle(),
         );
 
         // ...
@@ -63,7 +63,7 @@ So if you have 1m records and set --max-per-page to 10k -- you will have 100 mes
 2) Consume your messages with
 
 ```
-$ php bin/console rabbitmq:consume elastica -vvv
+$ php bin/console rabbitmq:consume vadiktok_elastica -vvv
 ```
 The more consumers you run -- the faster your indexes will be populated.
 According to my experience reasonable amount of consumers is from 5 to 10.
