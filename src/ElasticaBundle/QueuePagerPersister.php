@@ -35,12 +35,18 @@ class QueuePagerPersister implements PagerPersisterInterface
      * QueuePagerPersister constructor.
      * @param PersisterRegistry $registry
      * @param EventDispatcherInterface $dispatcher
-     * @param ProducerInterface $producer
      */
-    public function __construct(PersisterRegistry $registry, EventDispatcherInterface $dispatcher, ProducerInterface $producer)
+    public function __construct(PersisterRegistry $registry, EventDispatcherInterface $dispatcher)
     {
         $this->registry = $registry;
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param ProducerInterface|null $producer
+     */
+    public function setProducer(ProducerInterface $producer = null)
+    {
         $this->producer = $producer;
     }
 
@@ -49,6 +55,10 @@ class QueuePagerPersister implements PagerPersisterInterface
      */
     public function insert(PagerInterface $pager, array $options = array())
     {
+        if (null === $this->producer) {
+            throw new \LogicException('Producer is not configured. Please follow installation steps from README.md');
+        }
+
         $pager->setMaxPerPage(empty($options['max_per_page']) ? 100 : $options['max_per_page']);
 
         $options = array_replace([

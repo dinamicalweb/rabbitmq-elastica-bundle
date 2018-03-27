@@ -11,6 +11,7 @@ services:
         arguments:
             - '@fos_elastica.persister_registry'
             - '@event_dispatcher'
-            - '@old_sound_rabbit_mq.vadiktok_elastica_producer'
+        calls:
+            - [setProducer, ['@?old_sound_rabbit_mq.vadiktok_elastica_producer']]
         tags:
             - { name: 'fos_elastica.pager_persister', persisterName: 'queue' }
