@@ -53,10 +53,10 @@ old_sound_rabbit_mq:
 
 ### Usage
 
-1) Run elastica populate command with --pager-persister option set to "queue"
+1) Run elastica populate command with --pager-persister option set to "rabbitmq"
 
 ```
-$ php bin/console fos:elastica:populate --pager-persister=queue
+$ php bin/console fos:elastica:populate --pager-persister=rabbitmq
 ```
 
 Also you might want to use --max-per-page option. By default it is set to 100 and in my case 20k worked perfectly.

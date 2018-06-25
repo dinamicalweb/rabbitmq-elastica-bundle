@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class QueuePagerPersister implements PagerPersisterInterface
 {
-    const NAME = 'queue';
+    const NAME = 'rabbitmq';
     
     /**
      * @var PersisterRegistry

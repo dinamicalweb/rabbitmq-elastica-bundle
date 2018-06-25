@@ -14,4 +14,4 @@ services:
         calls:
             - [setProducer, ['@?old_sound_rabbit_mq.vadiktok_elastica_producer']]
         tags:
-            - { name: 'fos_elastica.pager_persister', persisterName: 'queue' }
+            - { name: 'fos_elastica.pager_persister', persisterName: 'rabbitmq' }
