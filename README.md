@@ -47,7 +47,7 @@ old_sound_rabbit_mq:
             connection: default
             exchange_options: { name: elastica, type: direct }
             queue_options:    { name: elastica }
-            callback: vadiktok.rabbitmq.consumer.elastica
+            callback: vadiktok.rabbitmq.elastica.consumer
 
 ```
 
@@ -76,3 +76,25 @@ The more consumers you run -- the faster your indexes will be populated.
 According to my experience reasonable amount of consumers is from 5 to 10.
 
 Also I recommend to use [SupervisorD](http://supervisord.org/) for that.
+
+### Configuration
+
+By default bundle will look at `vadiktok_elastica` producer and publish all messages to it.
+But you may also want to modify that name. In this case just add this into your config.yml file:
+
+```
+vadiktok_rabbit_mq_elastica:
+    producers:
+        your_producer_id: ~
+```
+
+Or even more. Imagine you want to split your indexes into different queues.
+All you have to do is define your consumers/producers same that is described in Installation section
+and then tell the bundle which producer to use:
+
+```
+vadiktok_rabbit_mq_elastica:
+    producers:
+        your_producer_id_1: [index_name_1, index_name_2]
+        your_producer_id_2: [index_name_3, index_name_4]
+```

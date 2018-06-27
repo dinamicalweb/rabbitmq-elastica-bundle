@@ -1,17 +1,20 @@
 services:
-    vadiktok.rabbitmq.consumer.elastica:
-        class: Vadiktok\RabbitMQElasticaBundle\ElasticaConsumer
+    vadiktok.rabbitmq.elastica.consumer:
+        class: Vadiktok\RabbitMQElasticaBundle\RabbitMQ\ElasticaConsumer
         arguments:
             - "@fos_elastica.pager_provider_registry"
             - "@fos_elastica.persister_registry"
             - '@event_dispatcher'
+
+    vadiktok.rabbitmq.elastica.producer_provider:
+        class: Vadiktok\RabbitMQElasticaBundle\RabbitMQ\ProducerProvider
+        arguments: ['%vadiktok_elastica.producers%']
 
     vadiktok.rabbitmq.elastica.queue_pager_perister:
         class: Vadiktok\RabbitMQElasticaBundle\QueuePagerPersister
         arguments:
             - '@fos_elastica.persister_registry'
             - '@event_dispatcher'
-        calls:
-            - [setProducer, ['@?old_sound_rabbit_mq.vadiktok_elastica_producer']]
+            - '@vadiktok.rabbitmq.elastica.producer_provider'
         tags:
             - { name: 'fos_elastica.pager_persister', persisterName: 'rabbitmq' }

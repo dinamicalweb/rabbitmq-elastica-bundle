@@ -18,7 +18,24 @@ class VadiktokRabbitMQElasticaExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        if (!$config['producers']) {
+            $config['producers'] = ['vadiktok_elastica' => []];
+        }
+
+        $container->setParameter('vadiktok_elastica.producers', $config['producers']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return 'vadiktok_rabbit_mq_elastica';
     }
 }

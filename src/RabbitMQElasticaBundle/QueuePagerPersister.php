@@ -9,8 +9,8 @@ use FOS\ElasticaBundle\Persister\Event\PrePersistEvent;
 use FOS\ElasticaBundle\Persister\PagerPersisterInterface;
 use FOS\ElasticaBundle\Persister\PersisterRegistry;
 use FOS\ElasticaBundle\Provider\PagerInterface;
-use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Vadiktok\RabbitMQElasticaBundle\RabbitMQ\ProducerProvider;
 
 class QueuePagerPersister implements PagerPersisterInterface
 {
@@ -27,27 +27,20 @@ class QueuePagerPersister implements PagerPersisterInterface
     private $dispatcher;
 
     /**
-     * @var ProducerInterface
+     * @var ProducerProvider
      */
-    private $producer;
+    private $producerProvider;
 
     /**
      * QueuePagerPersister constructor.
      * @param PersisterRegistry $registry
      * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(PersisterRegistry $registry, EventDispatcherInterface $dispatcher)
+    public function __construct(PersisterRegistry $registry, EventDispatcherInterface $dispatcher, ProducerProvider $producerProvider)
     {
         $this->registry = $registry;
         $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * @param ProducerInterface|null $producer
-     */
-    public function setProducer(ProducerInterface $producer = null)
-    {
-        $this->producer = $producer;
+        $this->producerProvider = $producerProvider;
     }
 
     /**
@@ -55,9 +48,7 @@ class QueuePagerPersister implements PagerPersisterInterface
      */
     public function insert(PagerInterface $pager, array $options = array())
     {
-        if (null === $this->producer) {
-            throw new \LogicException('Producer is not configured. Please follow installation steps from README.md');
-        }
+        $producer =$this->producerProvider->provide($options['indexName']);
 
         $pager->setMaxPerPage(empty($options['max_per_page']) ? 100 : $options['max_per_page']);
 
@@ -82,7 +73,7 @@ class QueuePagerPersister implements PagerPersisterInterface
             do {
                 $pager->setCurrentPage($page);
 
-                $this->producer->publish(serialize([
+                $producer->publish(serialize([
                     $page,
                     $options
                 ]));

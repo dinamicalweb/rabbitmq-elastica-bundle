@@ -1,6 +1,6 @@
 <?php
 
-namespace Vadiktok\RabbitMQElasticaBundle;
+namespace Vadiktok\RabbitMQElasticaBundle\RabbitMQ;
 
 use FOS\ElasticaBundle\Persister\Event\Events;
 use FOS\ElasticaBundle\Persister\Event\OnExceptionEvent;
