@@ -15,7 +15,9 @@ use Vadiktok\RabbitMQElasticaBundle\RabbitMQ\ProducerProvider;
 class QueuePagerPersister implements PagerPersisterInterface
 {
     const NAME = 'rabbitmq';
-    
+    const ORDER_ASC = 'ASC';
+    const ORDER_DESC = 'DESC';
+
     /**
      * @var PersisterRegistry
      */
@@ -32,15 +34,28 @@ class QueuePagerPersister implements PagerPersisterInterface
     private $producerProvider;
 
     /**
+     * @var string
+     */
+    private $order;
+
+    /**
      * QueuePagerPersister constructor.
      * @param PersisterRegistry $registry
      * @param EventDispatcherInterface $dispatcher
+     * @param ProducerProvider $producerProvider
+     * @param string $order
      */
-    public function __construct(PersisterRegistry $registry, EventDispatcherInterface $dispatcher, ProducerProvider $producerProvider)
+    public function __construct(
+        PersisterRegistry $registry,
+        EventDispatcherInterface $dispatcher,
+        ProducerProvider $producerProvider,
+        string $order
+    )
     {
         $this->registry = $registry;
         $this->dispatcher = $dispatcher;
         $this->producerProvider = $producerProvider;
+        $this->order = $order;
     }
 
     /**
@@ -69,7 +84,14 @@ class QueuePagerPersister implements PagerPersisterInterface
             $options = $event->getOptions();
 
             $lastPage = min($options['last_page'], $pager->getNbPages());
+
+            if ($this->order === self::ORDER_DESC) {
+                $pager->setCurrentPage($lastPage);
+                $lastPage = 1;
+            }
+
             $page = $pager->getCurrentPage();
+
             do {
                 $pager->setCurrentPage($page);
 
@@ -84,8 +106,13 @@ class QueuePagerPersister implements PagerPersisterInterface
 
                 $event = new PostAsyncInsertObjectsEvent($pager, $objectPersister, $count, null, $options);
                 $this->dispatcher->dispatch(Events::POST_ASYNC_INSERT_OBJECTS, $event);
-                $page++;
-            } while ($page <= $lastPage);
+
+                if ($this->order === self::ORDER_ASC) {
+                    $page++;
+                } else {
+                    $page--;
+                }
+            } while (($this->order === self::ORDER_ASC && $page <= $lastPage) || ($this->order === self::ORDER_DESC && $page >= $lastPage));
         } finally {
             $event = new PostPersistEvent($pager, $objectPersister, $options);
             $this->dispatcher->dispatch(Events::POST_PERSIST, $event);

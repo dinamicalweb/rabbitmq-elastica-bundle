@@ -29,6 +29,8 @@ class VadiktokRabbitMQElasticaExtension extends Extension
         }
 
         $container->setParameter('vadiktok_elastica.producers', $config['producers']);
+
+        $container->setParameter('vadiktok_elastica.order', $config['order']);
     }
 
     /**

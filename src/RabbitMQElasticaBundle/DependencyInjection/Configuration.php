@@ -4,6 +4,7 @@ namespace Vadiktok\RabbitMQElasticaBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Vadiktok\RabbitMQElasticaBundle\QueuePagerPersister;
 
 /**
  * Class Configuration
@@ -26,6 +27,10 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')
                             ->end()
                     ->end()
+                ->end()
+                ->enumNode('order')
+                    ->values([QueuePagerPersister::ORDER_ASC, QueuePagerPersister::ORDER_DESC])
+                    ->defaultValue(QueuePagerPersister::ORDER_ASC)
                 ->end()
             ->end();
 

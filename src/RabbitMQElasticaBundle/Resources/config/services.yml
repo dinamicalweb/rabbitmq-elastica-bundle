@@ -16,5 +16,6 @@ services:
             - '@fos_elastica.persister_registry'
             - '@event_dispatcher'
             - '@vadiktok.rabbitmq.elastica.producer_provider'
+            - '%vadiktok_elastica.order%'
         tags:
             - { name: 'fos_elastica.pager_persister', persisterName: 'rabbitmq' }
