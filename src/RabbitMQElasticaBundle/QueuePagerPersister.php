@@ -92,17 +92,18 @@ class QueuePagerPersister implements PagerPersisterInterface
             do {
                 $pager->setCurrentPage($page);
 
-                $toPublish[] = serialize([
-                    $page,
-                    $options
-                ]);
-
                 $count = $page == $lastPage
                     ? $pager->getNbResults() - (($page - 1) * $pager->getMaxPerPage())
                     : $pager->getMaxPerPage();
 
                 $event = new PostAsyncInsertObjectsEvent($pager, $objectPersister, $count, null, $options);
                 $this->dispatcher->dispatch(Events::POST_ASYNC_INSERT_OBJECTS, $event);
+
+                $toPublish[] = serialize([
+                    $page,
+                    $count,
+                    $options
+                ]);
 
                 $page++;
             } while ($page <= $lastPage);
