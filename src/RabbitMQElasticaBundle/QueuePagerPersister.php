@@ -22,7 +22,7 @@ class QueuePagerPersister implements PagerPersisterInterface
      * @var PersisterRegistry
      */
     private $registry;
-    
+
     /**
      * @var EventDispatcherInterface
      */
@@ -77,6 +77,8 @@ class QueuePagerPersister implements PagerPersisterInterface
 
         $objectPersister = $this->registry->getPersister($options['indexName'], $options['typeName']);
 
+        $toPublish = [];
+
         try {
             $event = new PrePersistEvent($pager, $objectPersister, $options);
             $this->dispatcher->dispatch(Events::PRE_PERSIST, $event);
@@ -85,20 +87,15 @@ class QueuePagerPersister implements PagerPersisterInterface
 
             $lastPage = min($options['last_page'], $pager->getNbPages());
 
-            if ($this->order === self::ORDER_DESC) {
-                $pager->setCurrentPage($lastPage);
-                $lastPage = 1;
-            }
-
             $page = $pager->getCurrentPage();
 
             do {
                 $pager->setCurrentPage($page);
 
-                $producer->publish(serialize([
+                $toPublish[] = serialize([
                     $page,
                     $options
-                ]));
+                ]);
 
                 $count = $page == $lastPage
                     ? $pager->getNbResults() - (($page - 1) * $pager->getMaxPerPage())
@@ -107,13 +104,15 @@ class QueuePagerPersister implements PagerPersisterInterface
                 $event = new PostAsyncInsertObjectsEvent($pager, $objectPersister, $count, null, $options);
                 $this->dispatcher->dispatch(Events::POST_ASYNC_INSERT_OBJECTS, $event);
 
-                if ($this->order === self::ORDER_ASC) {
-                    $page++;
-                } else {
-                    $page--;
-                }
-            } while (($this->order === self::ORDER_ASC && $page <= $lastPage) || ($this->order === self::ORDER_DESC && $page >= $lastPage));
+                $page++;
+            } while ($page <= $lastPage);
         } finally {
+            if ($toPublish) {
+                array_map(function (string $message) use ($producer) {
+                    $producer->publish($message);
+                }, $this->order === self::ORDER_DESC ? array_reverse($toPublish) : $toPublish);
+            }
+
             $event = new PostPersistEvent($pager, $objectPersister, $options);
             $this->dispatcher->dispatch(Events::POST_PERSIST, $event);
         }
