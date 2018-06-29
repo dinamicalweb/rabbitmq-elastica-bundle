@@ -50,7 +50,8 @@ class ElasticaConsumer implements ConsumerInterface
     public function execute(AMQPMessage $message)
     {
         $data = unserialize($message->getBody());
-        list($page, $options) = $data;
+        list($page, $count, $options) = $data;
+
         $provider = $this->pagerProviderRegistry->getProvider($options['indexName'], $options['typeName']);
         $pager = $provider->provide($options);
 
@@ -69,6 +70,8 @@ class ElasticaConsumer implements ConsumerInterface
         if ($objects instanceof \Traversable) {
             $objects = iterator_to_array($objects);
         }
+
+        $objects = array_slice($objects, 0, $count);
 
         $event = new PreInsertObjectsEvent($pager, $objectPersister, $objects, $options);
         $this->dispatcher->dispatch(Events::PRE_INSERT_OBJECTS, $event);
