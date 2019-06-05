@@ -98,3 +98,10 @@ vadiktok_rabbit_mq_elastica:
         your_producer_id_1: [index_name_1, index_name_2]
         your_producer_id_2: [index_name_3, index_name_4]
 ```
+
+Now imagine you need your new data first instead of waiting to index data from the first record.
+All you have to do is to add "order" parameter:
+```
+vadiktok_rabbit_mq_elastica:
+    order: DESC
+```
