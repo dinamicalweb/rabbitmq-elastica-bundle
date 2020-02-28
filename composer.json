@@ -1,9 +1,7 @@
 {
     "name": "vadiktok/rabbitmq-elastica-bundle",
     "require": {
-        "php": ">=7.0"
-    },
-    "require-dev": {
+        "php": ">=7.0",
         "friendsofsymfony/elastica-bundle": "^5.0",
         "php-amqplib/rabbitmq-bundle": "^1.11",
         "symfony/symfony": "^3.4|^4"
