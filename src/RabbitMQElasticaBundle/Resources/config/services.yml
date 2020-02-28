@@ -11,6 +11,7 @@ services:
         arguments: ['%vadiktok_elastica.producers%']
 
     vadiktok.rabbitmq.elastica.queue_pager_perister:
+        public: true
         class: Vadiktok\RabbitMQElasticaBundle\QueuePagerPersister
         arguments:
             - '@fos_elastica.persister_registry'
