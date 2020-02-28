@@ -6,7 +6,7 @@
     "require-dev": {
         "friendsofsymfony/elastica-bundle": "^5.0",
         "php-amqplib/rabbitmq-bundle": "^1.11",
-        "symfony/symfony": "3.4.*"
+        "symfony/symfony": "^3.4|^4"
     },
     "authors": [
         {
