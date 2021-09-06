@@ -3,7 +3,7 @@
     "require": {
         "php": "^7.1",
         "friendsofsymfony/elastica-bundle": ">=5.0",
-        "php-amqplib/rabbitmq-bundle": "^1.11"
+        "php-amqplib/rabbitmq-bundle": ">=1.11"
     },
     "authors": [
         {
