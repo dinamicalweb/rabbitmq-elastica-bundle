@@ -2,7 +2,6 @@
 
 namespace Vadiktok\RabbitMQElasticaBundle;
 
-use FOS\ElasticaBundle\Persister\Event\Events;
 use FOS\ElasticaBundle\Persister\Event\PostAsyncInsertObjectsEvent;
 use FOS\ElasticaBundle\Persister\Event\PostPersistEvent;
 use FOS\ElasticaBundle\Persister\Event\PrePersistEvent;
@@ -75,13 +74,13 @@ class QueuePagerPersister implements PagerPersisterInterface
 
         $pager->setCurrentPage($options['first_page']);
 
-        $objectPersister = $this->registry->getPersister($options['indexName'], $options['typeName']);
+        $objectPersister = $this->registry->getPersister($options['indexName']);
 
         $toPublish = [];
 
         try {
             $event = new PrePersistEvent($pager, $objectPersister, $options);
-            $this->dispatcher->dispatch(Events::PRE_PERSIST, $event);
+            $this->dispatcher->dispatch($event);
             $pager = $event->getPager();
             $options = $event->getOptions();
 
@@ -97,7 +96,7 @@ class QueuePagerPersister implements PagerPersisterInterface
                     : $pager->getMaxPerPage();
 
                 $event = new PostAsyncInsertObjectsEvent($pager, $objectPersister, $count, null, $options);
-                $this->dispatcher->dispatch(Events::POST_ASYNC_INSERT_OBJECTS, $event);
+                $this->dispatcher->dispatch($event);
 
                 $toPublish[] = serialize([
                     $page,
@@ -115,7 +114,7 @@ class QueuePagerPersister implements PagerPersisterInterface
             }
 
             $event = new PostPersistEvent($pager, $objectPersister, $options);
-            $this->dispatcher->dispatch(Events::POST_PERSIST, $event);
+            $this->dispatcher->dispatch($event);
         }
     }
 }
