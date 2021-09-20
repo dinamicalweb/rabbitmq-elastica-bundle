@@ -52,16 +52,16 @@ class ElasticaConsumer implements ConsumerInterface
         $data = unserialize($message->getBody());
         list($page, $count, $options) = $data;
 
-        $provider = $this->pagerProviderRegistry->getProvider($options['indexName'], $options['typeName']);
+        $provider = $this->pagerProviderRegistry->getProvider($options['indexName']);
         $pager = $provider->provide($options);
 
-        $objectPersister = $this->persisterRegistry->getPersister($options['indexName'], $options['typeName']);
+        $objectPersister = $this->persisterRegistry->getPersister($options['indexName']);
 
         $pager->setCurrentPage($page);
         $pager->setMaxPerPage($options['max_per_page']);
 
         $event = new PreFetchObjectsEvent($pager, $objectPersister, $options);
-        $this->dispatcher->dispatch(Events::PRE_FETCH_OBJECTS, $event);
+        $this->dispatcher->dispatch($event);
         $pager = $event->getPager();
         $options = $event->getOptions();
 
@@ -74,7 +74,7 @@ class ElasticaConsumer implements ConsumerInterface
         $objects = array_slice($objects, 0, $count);
 
         $event = new PreInsertObjectsEvent($pager, $objectPersister, $objects, $options);
-        $this->dispatcher->dispatch(Events::PRE_INSERT_OBJECTS, $event);
+        $this->dispatcher->dispatch($event);
         $pager = $event->getPager();
         $options = $event->getOptions();
         $objects = $event->getObjects();
@@ -85,14 +85,14 @@ class ElasticaConsumer implements ConsumerInterface
             }
 
             $event = new PostInsertObjectsEvent($pager, $objectPersister, $objects, $options);
-            $this->dispatcher->dispatch(Events::POST_INSERT_OBJECTS, $event);
+            $this->dispatcher->dispatch($event);
         } catch (\Exception $e) {
             $event = new OnExceptionEvent($pager, $objectPersister, $e, $objects, $options);
-            $this->dispatcher->dispatch(Events::ON_EXCEPTION, $event);
+            $this->dispatcher->dispatch($event);
 
             if ($event->isIgnored()) {
                 $event = new PostInsertObjectsEvent($pager, $objectPersister, $objects, $options);
-                $this->dispatcher->dispatch(Events::POST_INSERT_OBJECTS, $event);
+                $this->dispatcher->dispatch($event);
                 return self::MSG_REJECT;
             }
             return self::MSG_REJECT_REQUEUE;
